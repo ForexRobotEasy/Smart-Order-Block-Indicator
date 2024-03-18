@@ -1,0 +1,71 @@
+mql5
+//+------------------------------------------------------------------+
+//|                                                       Smart Order Block Indicator |
+//|                                       Copyright 2023, Forex Robot Easy Team |
+//|                                                  https://forexroboteasy.com |
+//+------------------------------------------------------------------+
+#property strict
+
+// Global variables
+int timeframeCount = 9;         // Number of timeframes to analyze
+int orderBlockPeriod = 10;      // Period to identify order blocks
+double reversalThreshold = 0.5; // Threshold for reversal detection
+
+//+------------------------------------------------------------------+
+//| Custom indicator initialization function                         |
+//+------------------------------------------------------------------+
+int OnInit()
+{
+    // Set indicator buffers
+    IndicatorBuffers(1);
+    SetIndexBuffer(0, orderBlockPeriod);
+
+    // Set indicator label
+    IndicatorShortName('Smart Order Block Indicator');
+
+    return(INIT_SUCCEEDED);
+}
+
+//+------------------------------------------------------------------+
+//| Custom indicator iteration function                              |
+//+------------------------------------------------------------------+
+int OnCalculate(const int rates_total,
+                const int prev_calculated,
+                const datetime &time[],
+                const double &open[],
+                const double &high[],
+                const double &low[],
+                const double &close[],
+                const long &tick_volume[],
+                const long &volume[],
+                const int &spread[])
+{
+    // Perform multi-timeframe analysis
+    for (int i = 0; i < timeframeCount; i++)
+    {
+        // Calculate order block values
+        double orderBlockValue = 0;
+        for (int j = 0; j < orderBlockPeriod; j++)
+        {
+            orderBlockValue += close[i * orderBlockPeriod + j];
+        }
+        orderBlockValue /= orderBlockPeriod;
+
+        // Detect market reversals
+        double currentPrice = close[i];
+        double previousPrice = close[i + 1];
+
+        if (currentPrice > previousPrice && (currentPrice - previousPrice) >= reversalThreshold * orderBlockValue)
+        {
+            // Execute buy order
+            // ...
+        }
+        else if (currentPrice < previousPrice && (previousPrice - currentPrice) >= reversalThreshold * orderBlockValue)
+        {
+            // Execute sell order
+            // ...
+        }
+    }
+
+    return(rates_total);
+}
